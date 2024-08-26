@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427419381135",
+    "project_id": "myfshop-49ec6",
+    "storage_bucket": "myfshop-49ec6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427419381135:android:43b533d14c334b019e6ffa",
+        "android_client_info": {
+          "package_name": "com.example.myfshop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc9Rh1z4qzV27M3asBYhe803vCWqwXt_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

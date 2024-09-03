@@ -1,4 +1,4 @@
-package com.example.myfshop.activities
+package com.example.myfshop.ui.activities
 
 import android.content.Context
 import android.os.Bundle

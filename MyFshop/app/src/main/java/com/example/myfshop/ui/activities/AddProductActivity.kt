@@ -20,6 +20,7 @@ import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.Toast
 import com.example.myfshop.firestore.FirestoreClass
 import com.example.myfshop.models.Product
@@ -30,6 +31,7 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
 
     private var mSelectedImageFileUri: Uri? = null
     private var mProductImageURL: String = ""
+    private var mProductID: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,13 +43,14 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
         }
         setupActionBar()
 
+        val spinnerCategory = findViewById<Spinner>(R.id.spinner_product_category)
+
+
         val ivAddUpdateProduct = findViewById<ImageView>(R.id.iv_add_update_product)
         ivAddUpdateProduct.setOnClickListener(this)
 
         val btnSubmit = findViewById<Button>(R.id.btn_submit_add_product)
         btnSubmit.setOnClickListener(this)
-
-
     }
 
     private fun setupActionBar() {
@@ -117,8 +120,6 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
             && requestCode == Constants.PICK_IMAGE_REQUEST_CODE
             && data!!.data != null
         ) {
-
-            // Replace the add icon with edit icon once the image is selected.
             ivAddUpdateProduct.setImageDrawable(
                 ContextCompat.getDrawable(
                     this@AddProductActivity,
@@ -201,10 +202,13 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
         val etproductprice = findViewById<EditText>(R.id.et_product_price)
         val etproductdescription = findViewById<EditText>(R.id.et_product_description)
         val etproductquantity = findViewById<EditText>(R.id.et_product_quantity)
+        val spinnerCategory = findViewById<Spinner>(R.id.spinner_product_category)
 
         val username =
             this.getSharedPreferences(Constants.MYFSHOP_PREFERENCES, Context.MODE_PRIVATE)
                 .getString(Constants.LOGGED_IN_USERNAME, "")!!
+
+        val selectedCategory = spinnerCategory.selectedItem.toString()
 
         val product = Product(
             FirestoreClass().getCurrentUserID(),
@@ -213,15 +217,15 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
             etproductprice.text.toString().trim { it <= ' ' },
             etproductdescription.text.toString().trim { it <= ' ' },
             etproductquantity.text.toString().trim { it <= ' ' },
-            mProductImageURL
+            mProductImageURL,
+            "",
+            selectedCategory
         )
 
         FirestoreClass().uploadProductDetails(this@AddProductActivity, product)
     }
 
     fun productUploadSuccess() {
-
-        // Hide the progress dialog
         hideProgressDialog()
 
         Toast.makeText(
@@ -229,10 +233,6 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
             resources.getString(R.string.product_uploaded_success_message),
             Toast.LENGTH_SHORT
         ).show()
-
         finish()
     }
-
-
-
 }

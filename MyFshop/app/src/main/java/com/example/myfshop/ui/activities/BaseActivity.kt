@@ -34,6 +34,11 @@ open class BaseActivity : AppCompatActivity() {
                 )
             )
         }
+//        if (errorMessage) {
+//            snackBarView.setBackgroundColor(resources.getColor(R.color.snackbar_error_color))
+//        } else {
+//            snackBarView.setBackgroundColor(resources.getColor(R.color.snackbar_success_color))
+//        }
         snackBar.show()
     }
 
@@ -41,6 +46,10 @@ open class BaseActivity : AppCompatActivity() {
         mProgressDialog = Dialog(this)
 
         mProgressDialog.setContentView(R.layout.dialog_progress)
+        mProgressDialog.findViewById<TextView>(R.id.tv_progress_text).text = text
+        mProgressDialog.setCancelable(false)
+        mProgressDialog.setCanceledOnTouchOutside(false)
+        mProgressDialog.show()
 
         val tvProgressText = mProgressDialog.findViewById<TextView>(R.id.tv_progress_text)
 

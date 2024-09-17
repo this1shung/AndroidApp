@@ -1,5 +1,6 @@
 package com.example.myfshop.ui.fragments
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,7 @@ import com.example.myfshop.models.Product
 import com.example.myfshop.ui.activities.AddProductActivity
 import com.example.myfshop.ui.adapters.MyProductsListAdapter
 import com.example.myfshop.ui.fragments.BaseFragment
+import com.example.myfshop.utils.Constants
 
 class ProductsFragment : BaseFragment() {
 
@@ -22,6 +24,7 @@ class ProductsFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
     }
 
     override fun onCreateView(
@@ -50,21 +53,26 @@ class ProductsFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        val isUpdated = activity?.intent?.getBooleanExtra("isProductUpdated", false) ?: false
+
+        if (isUpdated) {
+            getProductListFromFireStore()  // Refresh the product list
+        }
 
         getProductListFromFireStore()
+        hideProgressDialog()
     }
 
     private fun getProductListFromFireStore() {
         showProgressDialog(resources.getString(R.string.please_wait))
         FirestoreClass().getProductsList(this@ProductsFragment)
+        hideProgressDialog()
     }
 
     fun successProductsListFromFireStore(productsList: ArrayList<Product>) {
         val rv_my_product_items = mRootView.findViewById<RecyclerView>(R.id.rv_my_product_items)
         val tv_no_products_found = mRootView.findViewById<TextView>(R.id.tv_no_products_found)
 
-
-        // Hide Progress dialog.
         hideProgressDialog()
 
         if (productsList.size > 0) {
@@ -84,6 +92,7 @@ class ProductsFragment : BaseFragment() {
     }
 
     fun deleteProduct(productID: String) {
+        //hideProgressDialog()
         showAlertDialogToDeleteProduct(productID)
     }
 
@@ -103,36 +112,31 @@ class ProductsFragment : BaseFragment() {
     private fun showAlertDialogToDeleteProduct(productID: String) {
 
         val builder = AlertDialog.Builder(requireActivity())
-        //set title for alert dialog
         builder.setTitle(resources.getString(R.string.delete_dialog_title))
-        //set message for alert dialog
         builder.setMessage(resources.getString(R.string.delete_dialog_message))
         builder.setIcon(android.R.drawable.ic_dialog_alert)
 
-        //performing positive action
         builder.setPositiveButton(resources.getString(R.string.yes)) { dialogInterface, _ ->
-
-            // TODO Step 7: Call the function to delete the product from cloud firestore.
-            // START
-            // Show the progress dialog.
             showProgressDialog(resources.getString(R.string.please_wait))
 
-            // Call the function of Firestore class.
             FirestoreClass().deleteProduct(this@ProductsFragment, productID)
-            // END
 
             dialogInterface.dismiss()
         }
-
-        //performing negative action
         builder.setNegativeButton(resources.getString(R.string.no)) { dialogInterface, _ ->
 
             dialogInterface.dismiss()
         }
-        // Create the AlertDialog
         val alertDialog: AlertDialog = builder.create()
-        // Set other dialog properties
         alertDialog.setCancelable(false)
         alertDialog.show()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.EDIT_PRODUCT_REQUEST_CODE && resultCode == RESULT_OK) {
+            getProductListFromFireStore() // Refresh product list after editing
+        }
+    }
+
 }

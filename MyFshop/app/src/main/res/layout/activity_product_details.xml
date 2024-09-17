@@ -144,13 +144,51 @@
                     tools:text="5" />
             </LinearLayout>
 
+            <Spinner
+                android:id="@+id/spinner_product_size"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/product_details_label_margin"
+                android:entries="@array/product_sizes"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ll_product_details_quantity" />
+
+            <LinearLayout
+                android:id="@+id/ll_product_details_rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/product_details_label_margin"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_product_size">
+
+                <RatingBar
+                    android:id="@+id/rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="0.5"
+                    android:rating="3" />
+
+                <TextView
+                    android:id="@+id/tv_average_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:paddingStart="8dp"
+                    android:textColor="@color/white"
+                    tools:text="Average: 0.0" />
+            </LinearLayout>
+
             <com.example.myfshop.utils.MSPButton
                 android:id="@+id/btn_add_to_cart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="110dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/button_background"
@@ -173,7 +211,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="110dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/button_background"
@@ -192,4 +230,3 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <!--END-->

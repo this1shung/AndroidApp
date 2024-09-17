@@ -129,4 +129,24 @@
     <string name="title_sold_products">Sold Products</string>
     <string name="no_products_sold_yet">No products sold yet!</string>
     <string name="title_sold_product_details">SOLD PRODUCT DETAILS</string>
+    <string name="title_activity_admin_dashboard">AdminDashboardActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_admin_dashboard">AdminDashboard</string>
+    <string name="title_user">User</string>
+    <string name="err_msg_product_details">Failed to load product details.</string>
+
+    <string-array name="product_category_array">
+        <item>Pant</item>
+        <item>Shirt</item>
+    </string-array>
+    <string name="title_edit_product">EDIT PRODUCT</string>
+    <string name="edit_product">Edit Product</string>
+    <string name="product_update_success_message">Product updated successfully.</string>
+    <string-array name="product_sizes">
+        <item>S</item>
+        <item>M</item>
+        <item>L</item>
+        <item>XL</item>
+    </string-array>
 </resources>

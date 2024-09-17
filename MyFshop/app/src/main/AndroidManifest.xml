@@ -18,6 +18,19 @@
         android:theme="@style/Theme.MyFshop"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activities.EditProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.EditUserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.adapters.UsersListAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.AdminDashboardActivity"
+            android:exported="false"
+            android:label="@string/title_activity_admin_dashboard" />
+        <activity
             android:name=".ui.activities.SoldProductDetailsActivity"
             android:exported="false" />
         <activity

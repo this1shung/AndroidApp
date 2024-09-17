@@ -3,6 +3,7 @@ package com.example.myfshop.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
@@ -13,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.myfshop.R
 import com.example.myfshop.firestore.FirestoreClass
 import com.example.myfshop.models.User
+import com.example.myfshop.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -109,15 +111,22 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 }
         }
     }
-    fun userLoggedInSuccess(user: User) {
 
+    fun userLoggedInSuccess(user: User) {
         hideProgressDialog()
+
+        Log.d("LoginActivity", "User role: ${user.role}") // Debug log
 
         if (user.profileCompleted == 0) {
             val intent = Intent(this@LoginActivity, UserProfileActivity::class.java)
+            intent.putExtra(Constants.EXTRA_USER_DETAILS, user)
             startActivity(intent)
         } else {
-            startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+            if (user.role == "admin") {
+                startActivity(Intent(this@LoginActivity, AdminDashboardActivity::class.java))
+            } else {
+                startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+            }
         }
         finish()
     }

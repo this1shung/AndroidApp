@@ -20,13 +20,6 @@ open class MyOrdersListAdapter(
     private var list: ArrayList<Order>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
-    /**
-     * Inflates the item views which is designed in xml layout file
-     *
-     * create a new
-     * {@link ViewHolder} and initializes some private fields to be used by RecyclerView.
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyViewHolder(
             LayoutInflater.from(context).inflate(

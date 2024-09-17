@@ -56,6 +56,7 @@ class SoldProductDetailsActivity : AppCompatActivity() {
 
         toolbar_sold_product_details_activity.setNavigationOnClickListener { onBackPressed() }
     }
+
     private fun setupUI(productDetails: SoldProduct) {
         val tvSoldProductDetailsId = findViewById<TextView>(R.id.tv_sold_product_details_id)
         val tvSoldProductDetailsDate = findViewById<TextView>(R.id.tv_sold_product_details_date)
@@ -72,6 +73,7 @@ class SoldProductDetailsActivity : AppCompatActivity() {
         val tvSoldProductSubTotal = findViewById<TextView>(R.id.tv_sold_product_sub_total)
         val tvSoldProductShippingCharge = findViewById<TextView>(R.id.tv_sold_product_shipping_charge)
         val tvSoldProductTotalAmount = findViewById<TextView>(R.id.tv_sold_product_total_amount)
+        val tvProductItemSize = findViewById<TextView>(R.id.tv_product_item_size)
 
         // Set the product ID
         tvSoldProductDetailsId.text = productDetails.order_id
@@ -94,6 +96,7 @@ class SoldProductDetailsActivity : AppCompatActivity() {
         tvProductItemName.text = productDetails.title
         tvProductItemPrice.text = "$${productDetails.price}"
         tvSoldProductQuantity.text = productDetails.sold_quantity
+        tvProductItemSize.text = productDetails.size // Set the size
 
         // Set address details
         with(productDetails.address) {

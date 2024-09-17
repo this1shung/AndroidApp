@@ -28,6 +28,11 @@ open class DashboardItemsListAdapter(
             )
         )
     }
+    //add
+    fun updateList(newList: ArrayList<Product>) {
+        list = newList
+        notifyDataSetChanged()
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -57,6 +62,7 @@ open class DashboardItemsListAdapter(
     override fun getItemCount(): Int {
         return list.size
     }
+
     interface OnClickListener {
         fun onClick(position: Int, product: Product)
     }

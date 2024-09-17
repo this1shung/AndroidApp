@@ -1,15 +1,19 @@
 package com.example.myfshop.firestore
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.myfshop.R
 import com.example.myfshop.models.Address
 import com.example.myfshop.models.CartItem
 import com.example.myfshop.models.Order
 import com.example.myfshop.models.Product
+import com.example.myfshop.models.Rating
 import com.example.myfshop.models.SoldProduct
 import com.example.myfshop.ui.activities.LoginActivity
 import com.example.myfshop.ui.activities.RegisterActivity
@@ -20,6 +24,7 @@ import com.example.myfshop.ui.activities.AddProductActivity
 import com.example.myfshop.ui.activities.AddressListActivity
 import com.example.myfshop.ui.activities.CartListActivity
 import com.example.myfshop.ui.activities.CheckoutActivity
+import com.example.myfshop.ui.activities.EditProductActivity
 import com.example.myfshop.ui.activities.ProductDetailsActivity
 import com.example.myfshop.ui.activities.SettingsActivity
 import com.example.myfshop.ui.fragments.DashboardFragment
@@ -32,6 +37,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import  com.example.myfshop.ui.fragments.ProductsFragment
 import com.example.myfshop.ui.fragments.SoldProductsFragment
+import com.example.myfshop.ui.fragments.UserFragment
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.QuerySnapshot
 
 class FirestoreClass {
     private val mFireStore = FirebaseFirestore.getInstance()
@@ -56,6 +64,7 @@ class FirestoreClass {
                 )
             }
     }
+
     fun getCurrentUserID(): String {
         val currentUser = FirebaseAuth.getInstance().currentUser
 
@@ -66,19 +75,76 @@ class FirestoreClass {
 
         return currentUserID
     }
+
+    //    fun getUserDetails(activity: Activity) {
+//        mFireStore.collection(Constants.USERS)
+//            .document(getCurrentUserID())
+//            .get()
+//            .addOnSuccessListener { document ->
+//
+//                Log.i(activity.javaClass.simpleName, "Document: ${document.data}")
+//
+//                val user = document.toObject(User::class.java)!!
+//
+//                // Ghi log giá trị của role
+//                Log.i(activity.javaClass.simpleName, "User role: ${user.role}")
+//
+//                val sharedPreferences =
+//                    activity.getSharedPreferences(
+//                        Constants.MYFSHOP_PREFERENCES,
+//                        Context.MODE_PRIVATE
+//                    )
+//
+//                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+//                editor.putString(
+//                    Constants.LOGGED_IN_USERNAME,
+//                    "${user.firstName} ${user.lastName}"
+//                )
+//                editor.apply()
+//
+//                when (activity) {
+//                    is LoginActivity -> {
+//                        activity.userLoggedInSuccess(user)
+//                    }
+//
+//                    is SettingsActivity -> {
+//                        activity.userDetailsSuccess(user)
+//                    }
+//                }
+//
+//            }
+//            .addOnFailureListener { e ->
+//                when (activity) {
+//                    is LoginActivity -> {
+//                        activity.hideProgressDialog()
+//                    }
+//
+//                    is SettingsActivity -> {
+//                        activity.hideProgressDialog()
+//                    }
+//                }
+//
+//                Log.e(
+//                    activity.javaClass.simpleName,
+//                    "Error while getting user details.",
+//                    e
+//                )
+//            }
+//    }
+//
     fun getUserDetails(activity: Activity) {
 
         mFireStore.collection(Constants.USERS)
-
             .document(getCurrentUserID())
             .get()
             .addOnSuccessListener { document ->
 
                 Log.i(activity.javaClass.simpleName, document.toString())
 
-
+                // Convert the document into a User object
                 val user = document.toObject(User::class.java)!!
 
+                // Store the logged-in user's full name in SharedPreferences
                 val sharedPreferences =
                     activity.getSharedPreferences(
                         Constants.MYFSHOP_PREFERENCES,
@@ -92,11 +158,13 @@ class FirestoreClass {
                 )
                 editor.apply()
 
+                // Handle different activities based on the retrieved user's role
                 when (activity) {
                     is LoginActivity -> {
                         activity.userLoggedInSuccess(user)
                     }
-                    is SettingsActivity ->{
+
+                    is SettingsActivity -> {
                         activity.userDetailsSuccess(user)
                     }
                 }
@@ -107,7 +175,8 @@ class FirestoreClass {
                     is LoginActivity -> {
                         activity.hideProgressDialog()
                     }
-                    is SettingsActivity ->{
+
+                    is SettingsActivity -> {
                         activity.hideProgressDialog()
                     }
                 }
@@ -119,6 +188,8 @@ class FirestoreClass {
                 )
             }
     }
+
+
     fun updateUserProfileData(activity: Activity, userHashMap: HashMap<String, Any>) {
         // Collection Name
         mFireStore.collection(Constants.USERS)
@@ -143,6 +214,7 @@ class FirestoreClass {
                         // Hide the progress dialog if there is any error. And print the error in log.
                         activity.hideProgressDialog()
                     }
+
                     is AddProductActivity -> {
                         activity.hideProgressDialog()
                     }
@@ -156,7 +228,7 @@ class FirestoreClass {
             }
     }
 
-    fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?,imageType: String) {
+    fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?, imageType: String) {
 
         //getting the storage reference
         val sRef: StorageReference = FirebaseStorage.getInstance().reference.child(
@@ -184,6 +256,7 @@ class FirestoreClass {
                             is UserProfileActivity -> {
                                 activity.imageUploadSuccess(uri.toString())
                             }
+
                             is AddProductActivity -> {
                                 activity.imageUploadSuccess(uri.toString())
                             }
@@ -207,6 +280,7 @@ class FirestoreClass {
                 )
             }
     }
+
     fun uploadProductDetails(activity: AddProductActivity, productInfo: Product) {
 
         mFireStore.collection(Constants.PRODUCTS)
@@ -347,25 +421,15 @@ class FirestoreClass {
     }
 
     fun addCartItems(activity: ProductDetailsActivity, addToCart: CartItem) {
-
         mFireStore.collection(Constants.CART_ITEMS)
             .document()
-            // Here the userInfo are Field and the SetOption is set to merge. It is for if we wants to merge
             .set(addToCart, SetOptions.merge())
             .addOnSuccessListener {
-
-                // Here call a function of base activity for transferring the result to it.
                 activity.addToCartSuccess()
             }
             .addOnFailureListener { e ->
-
                 activity.hideProgressDialog()
-
-                Log.e(
-                    activity.javaClass.simpleName,
-                    "Error while creating the document for cart item.",
-                    e
-                )
+                Log.e(activity.javaClass.simpleName, "Error while creating the document for cart item.", e)
             }
     }
 
@@ -423,6 +487,7 @@ class FirestoreClass {
                     is CartListActivity -> {
                         activity.successCartItemsList(list)
                     }
+
                     is CheckoutActivity -> {
                         activity.successCartItemsList(list)
                     }
@@ -434,6 +499,7 @@ class FirestoreClass {
                     is CartListActivity -> {
                         activity.hideProgressDialog()
                     }
+
                     is CheckoutActivity -> {
                         activity.hideProgressDialog()
                     }
@@ -599,6 +665,7 @@ class FirestoreClass {
             }
 
     }
+
     fun updateAddress(activity: AddEditAddressActivity, addressInfo: Address, addressId: String) {
 
         mFireStore.collection(Constants.ADDRESSES)
@@ -641,23 +708,15 @@ class FirestoreClass {
     }
 
     fun placeOrder(activity: CheckoutActivity, order: Order) {
-
         mFireStore.collection(Constants.ORDERS)
             .document()
-            // Here the userInfo are Field and the SetOption is set to merge. It is for if we wants to merge
             .set(order, SetOptions.merge())
             .addOnSuccessListener {
                 activity.orderPlacedSuccess()
             }
             .addOnFailureListener { e ->
-
-                // Hide the progress dialog if there is any error.
                 activity.hideProgressDialog()
-                Log.e(
-                    activity.javaClass.simpleName,
-                    "Error while placing an order.",
-                    e
-                )
+                Log.e(activity.javaClass.simpleName, "Error while placing an order.", e)
             }
     }
 
@@ -666,7 +725,7 @@ class FirestoreClass {
         for (cart in cartList) {
 
             val soldProduct = SoldProduct(
-                cart.product_owner_id,
+                "XzZ4uM0LuRaBjTG3rI24zru0CcG2",
                 cart.title,
                 cart.price,
                 cart.cart_quantity,
@@ -676,7 +735,10 @@ class FirestoreClass {
                 order.sub_total_amount,
                 order.shipping_charge,
                 order.total_amount,
-                order.address
+                order.address,
+                "",
+                order.size
+
             )
             val documentReference = mFireStore.collection(Constants.SOLD_PRODUCTS)
                 .document()
@@ -737,8 +799,6 @@ class FirestoreClass {
                 fragment.populateOrdersListInUI(list)
             }
             .addOnFailureListener { e ->
-                // Here call a function of base activity for transferring the result to it.
-
                 fragment.hideProgressDialog()
 
                 Log.e(fragment.javaClass.simpleName, "Error while getting the orders list.", e)
@@ -746,18 +806,14 @@ class FirestoreClass {
     }
 
     fun getSoldProductsList(fragment: SoldProductsFragment) {
-        // The collection name for SOLD PRODUCTS
         mFireStore.collection(Constants.SOLD_PRODUCTS)
             .whereEqualTo(Constants.USER_ID, getCurrentUserID())
-            .get() // Will get the documents snapshots.
+            .get()
             .addOnSuccessListener { document ->
-                // Here we get the list of sold products in the form of documents.
                 Log.e(fragment.javaClass.simpleName, document.documents.toString())
 
-                // Here we have created a new instance for Sold Products ArrayList.
                 val list: ArrayList<SoldProduct> = ArrayList()
 
-                // A for loop as per the list of documents to convert them into Sold Products ArrayList.
                 for (i in document.documents) {
 
                     val soldProduct = i.toObject(SoldProduct::class.java)!!
@@ -765,14 +821,10 @@ class FirestoreClass {
 
                     list.add(soldProduct)
                 }
-
-                // TODO Step 3: Notify the success result to the base class.
-                // START
                 fragment.successSoldProductsList(list)
-                // END
+
             }
             .addOnFailureListener { e ->
-                // Hide the progress dialog if there is any error.
                 fragment.hideProgressDialog()
 
                 Log.e(
@@ -784,4 +836,212 @@ class FirestoreClass {
     }
 
 
+
+
+//    fun getUsersList(callback: (List<User>) -> Unit) {
+//        FirebaseFirestore.getInstance().collection("users")
+//            .get()
+//            .addOnSuccessListener { result: QuerySnapshot ->
+//                val usersList = ArrayList<User>()
+//                for (document in result) {
+//                    val user = document.toObject(User::class.java)
+//                    usersList.add(user)
+//                }
+//                callback(usersList)
+//            }
+//            .addOnFailureListener {
+//                callback(emptyList())
+//            }
+//    }
+//
+//    fun getUserDetails(userID: String, callback: (User?) -> Unit) {
+//        FirebaseFirestore.getInstance().collection("users")
+//            .document(userID)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                if (document != null) {
+//                    val user = document.toObject(User::class.java)
+//                    callback(user)
+//                } else {
+//                    callback(null) // Handle error: user not found
+//                }
+//            }
+//            .addOnFailureListener { exception ->
+//                // Handle failure
+//                callback(null)
+//            }
+//    }
+
+    fun getUserRatingForProduct(productId: String, userId: String, callback: (Rating?) -> Unit) {
+        mFireStore.collection(Constants.RATINGS)
+            .whereEqualTo("productId", productId)
+            .whereEqualTo("userId", userId)
+            .limit(1)  // Thêm giới hạn này để đảm bảo chỉ lấy một kết quả
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val rating = documents.documents[0].toObject(Rating::class.java)
+                    callback(rating)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error getting user rating", e)
+                callback(null)
+            }
+    }
+
+    fun submitRating(rating: Rating, callback: (Boolean) -> Unit) {
+        val ratingsCollection = mFireStore.collection(Constants.RATINGS)
+
+        // Kiểm tra nếu đánh giá đã tồn tại
+        ratingsCollection
+            .whereEqualTo("productId", rating.product_id)
+            .whereEqualTo("userId", rating.user_id)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    // Nếu chưa có đánh giá, thêm mới
+                    ratingsCollection
+                        .add(mapOf(
+                            "productId" to rating.product_id,
+                            "userId" to rating.user_id,
+                            "rating" to rating.rating
+                        ))
+                        .addOnSuccessListener {
+                            callback(true)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error submitting new rating", e)
+                            callback(false)
+                        }
+                } else {
+                    // Nếu đã có đánh giá, cập nhật
+                    val documentId = documents.documents[0].id
+                    ratingsCollection.document(documentId)
+                        .set(mapOf(
+                            "productId" to rating.product_id,
+                            "userId" to rating.user_id,
+                            "rating" to rating.rating
+                        ))
+                        .addOnSuccessListener {
+                            callback(true)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error updating existing rating", e)
+                            callback(false)
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error checking for existing rating", e)
+                callback(false)
+            }
+    }
+
+
+
+    fun getProductAverageRating(productId: String, callback: (Float) -> Unit) {
+        mFireStore.collection(Constants.RATINGS)
+            .whereEqualTo("productId", productId)
+            .get()
+            .addOnSuccessListener { documents ->
+                val ratings = documents.mapNotNull { it.toObject(Rating::class.java).rating }
+                val averageRating = if (ratings.isNotEmpty()) ratings.average().toFloat() else 0f
+                callback(averageRating)
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error getting average rating", e)
+                callback(0f)
+            }
+    }
+
+    fun getUsersList(fragment: UserFragment) {
+        mFireStore.collection(Constants.USERS)
+            .get()
+            .addOnSuccessListener { document ->
+                val usersList: ArrayList<User> = ArrayList()
+                for (i in document.documents) {
+                    val user = i.toObject(User::class.java)!!
+                    user.id = i.id
+                    usersList.add(user)
+                }
+                fragment.successUsersListFromFireStore(usersList)
+            }
+            .addOnFailureListener { e ->
+                fragment.userDeleteFailure(e)
+            }
+    }
+
+    fun deleteUser(fragment: UserFragment, userId: String) {
+        mFireStore.collection(Constants.USERS)
+            .document(userId)
+            .delete()
+            .addOnSuccessListener {
+                fragment.userDeleteSuccess()
+            }
+            .addOnFailureListener { e ->
+                fragment.userDeleteFailure(e)
+            }
+    }
+
+    fun getUserDetails(userId: String) = mFireStore.collection("users").document(userId).get()
+
+    fun updateUserDetails(userId: String, userHashMap: HashMap<String, Any>) =
+        mFireStore.collection("users").document(userId).update(userHashMap)
+
+
+    fun getProductDetails(productId: String, callback: ProductDetailsCallback) {
+        // Fetch product details from Firestore
+        FirebaseFirestore.getInstance().collection("products").document(productId).get()
+            .addOnSuccessListener { document ->
+                val product = document.toObject(Product::class.java)
+                if (product != null) callback.onSuccess(product)
+            }
+            .addOnFailureListener { exception ->
+                callback.onFailure(exception)
+            }
+    }
+
+    fun addProduct(product: Product, callback: (Boolean) -> Unit) {
+        // Add product to Firestore
+        FirebaseFirestore.getInstance().collection("products").add(product)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    fun updateProduct(productId: String, product: Product, callback: (Boolean) -> Unit) {
+        // Update product in Firestore
+        FirebaseFirestore.getInstance().collection("products").document(productId).set(product)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+//    fun updateProductDetails(activity: EditProductActivity, productId: String, productHashMap: HashMap<String, Any>) {
+//        mFireStore.collection(Constants.PRODUCTS)
+//            .document(productId)
+//            .update(productHashMap)
+//            .addOnSuccessListener {
+//                activity.productUpdateSuccess()
+//            }
+//            .addOnFailureListener { e ->
+//                activity.hideProgressDialog()
+//                Log.e(activity.javaClass.simpleName, "Error while updating the product details.", e)
+//            }
+//    }
+    fun updateProductDetails(activity: Activity, productId: String, productHashMap: HashMap<String, Any>): Task<Void> {
+        return FirebaseFirestore.getInstance()
+            .collection(Constants.PRODUCTS)
+            .document(productId)
+            .update(productHashMap)
+    }
+
+
+    interface ProductDetailsCallback {
+        fun onSuccess(product: Product)
+        fun onFailure(exception: Exception)
+    }
+
 }
+
+

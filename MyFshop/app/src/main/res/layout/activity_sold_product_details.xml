@@ -172,6 +172,15 @@
                         tools:text="Name" />
 
                     <com.example.myfshop.utils.MSVTextView
+                        android:id="@+id/tv_product_item_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black"
+                        android:text="Size"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+
+                    <com.example.myfshop.utils.MSVTextView
                         android:id="@+id/tv_product_item_price"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -180,6 +189,7 @@
                         android:textSize="@dimen/sold_details_value_textSize"
                         android:textStyle="bold"
                         tools:text="$100.00" />
+
                 </LinearLayout>
 
                 <com.example.myfshop.utils.MSVTextView

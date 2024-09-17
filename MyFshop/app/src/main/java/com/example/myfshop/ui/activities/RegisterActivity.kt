@@ -158,8 +158,7 @@ class RegisterActivity : BaseActivity() {
                             false
                         )
 
-                        //FirebaseAuth.getInstance().signOut()
-                        //finish()
+
                     } else {
                         hideProgressDialog()
                         showErrorSnackBar(task.exception?.message.toString(), true)
@@ -174,5 +173,8 @@ class RegisterActivity : BaseActivity() {
             resources.getString(R.string.register_success),
             Toast.LENGTH_SHORT
         ).show()
+
+        FirebaseAuth.getInstance().signOut()
+        finish()
     }
 }

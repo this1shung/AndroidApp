@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.DashboardActivity">
+    tools:context=".ui.activities.AdminDashboardActivity">
 
     <!-- Toolbar to serve as the ActionBar -->
     <!-- Toolbar to serve as the ActionBar -->
@@ -31,7 +31,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/mobile_navigation" />
+        app:navGraph="@navigation/mobile_admin_navigation" />
 
     <!-- BottomNavigationView for navigation at the bottom -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -46,6 +46,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu"/>
+        app:menu="@menu/bottom_admin_nav_menu"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

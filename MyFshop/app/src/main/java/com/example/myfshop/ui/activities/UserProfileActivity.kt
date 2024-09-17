@@ -48,47 +48,47 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         val etFirstName = findViewById<EditText>(R.id.et_first_name)
         val etLastName = findViewById<EditText>(R.id.et_last_name)
         val etEmail = findViewById<EditText>(R.id.et_email)
-        val tvtitle = findViewById<TextView>(R.id.tv_title)
-        val mobileNumber = findViewById<EditText>(R.id.et_mobile_number)
-        val rbmale = findViewById<RadioButton>(R.id.rb_male)
-        val rbfemale = findViewById<RadioButton>(R.id.rb_female)
-        val ivuserphoto = findViewById<ImageView>(R.id.iv_user_photo)
+        val tvTitle = findViewById<TextView>(R.id.tv_title)
+        val etMobileNumber = findViewById<EditText>(R.id.et_mobile_number)
+        val rbMale = findViewById<RadioButton>(R.id.rb_male)
+        val rbFemale = findViewById<RadioButton>(R.id.rb_female)
+        val ivUserPhoto = findViewById<ImageView>(R.id.iv_user_photo)
 
-        if (mUserDetails?.profileCompleted != 0) {
-            tvtitle.text = resources.getString(R.string.title_complete_profile)
 
-            etFirstName.isEnabled = false
+
+        if (mUserDetails?.profileCompleted == 0) {
+            tvTitle.text = resources.getString(R.string.title_complete_profile)
             etFirstName.setText(mUserDetails?.firstName)
-
-            etLastName.isEnabled = false
+            etFirstName.isEnabled = false
             etLastName.setText(mUserDetails?.lastName)
-
-            etEmail.isEnabled = false
+            etLastName.isEnabled = false
             etEmail.setText(mUserDetails?.email)
+            etEmail.isEnabled = false
         } else {
             setupActionBar()
-            tvtitle.text = resources.getString(R.string.title_edit_profile)
-            mUserDetails?.let { GlideLoader(this@UserProfileActivity).loadUserPicture(it.image, ivuserphoto) }
+
+            tvTitle.text = resources.getString(R.string.title_edit_profile)
+
+            mUserDetails?.let { GlideLoader(this@UserProfileActivity).loadUserPicture(it.image, ivUserPhoto) }
+
             etFirstName.setText(mUserDetails?.firstName)
             etLastName.setText(mUserDetails?.lastName)
+
             etEmail.isEnabled = false
             etEmail.setText(mUserDetails?.email)
 
             if (mUserDetails?.mobile != 0L) {
-                mobileNumber.setText(mUserDetails?.mobile.toString())
+                etMobileNumber.setText(mUserDetails?.mobile.toString())
             }
             if (mUserDetails?.gender == Constants.MALE) {
-                rbmale.isChecked = true
+                rbMale.isChecked = true
             } else {
-                rbfemale.isChecked = true
+                rbFemale.isChecked = true
             }
         }
-        val ivUserPhoto = findViewById<ImageView>(R.id.iv_user_photo)
+
         ivUserPhoto.setOnClickListener(this@UserProfileActivity)
-
-        val buttonSave = findViewById<View>(R.id.btn_submit)
-        buttonSave.setOnClickListener(this@UserProfileActivity)
-
+        findViewById<View>(R.id.btn_submit).setOnClickListener(this@UserProfileActivity)
     }
 
     private fun setupActionBar() {
@@ -157,15 +157,17 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             userHashMap[Constants.IMAGE] = mUserProfileImageURL
         }
 
-        if (mobileNumber.isNotEmpty() && mobileNumber != mUserDetails?.mobile.toString() ) {
+        if (mobileNumber.isNotEmpty()) {
             userHashMap[Constants.MOBILE] = mobileNumber.toLong()
+        } else {
+            userHashMap[Constants.MOBILE] = 0L
         }
         if (gender.isNotEmpty() && gender != mUserDetails?.gender) {
             userHashMap[Constants.GENDER] = gender
         }
-        if (mUserDetails?.profileCompleted == 0) {
-            userHashMap[Constants.COMPLETE_PROFILE] = 1
-        }
+
+        userHashMap[Constants.COMPLETE_PROFILE] = 1
+
         FirestoreClass().updateUserProfileData(this, userHashMap)
     }
 

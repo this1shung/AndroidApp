@@ -1,7 +1,8 @@
 package com.example.myfshop.models
+
 import java.io.Serializable
 
-data class Product (
+data class Product(
     val user_id: String = "",
     val user_name: String = "",
     val title: String = "",
@@ -10,5 +11,10 @@ data class Product (
     val stock_quantity: String = "",
     val image: String = "",
     var product_id: String = "",
-): Serializable
+    val category: String = "",
+    var average_rating: Float = 0.0f,
+    var total_ratings: Int = 0,
+) : Serializable
+
+
 
